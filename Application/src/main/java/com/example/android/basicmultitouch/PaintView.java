@@ -25,7 +25,7 @@ public class PaintView extends View {
     public static int BRUSH_SIZE = 30;
     public static final int DEFAULT_COLOR = Color.BLACK;
     public static final int DEFAULT_BG_COLOR = Color.WHITE;
-    private static final float TOUCH_TOLERANCE = 4;
+    private static final float TOUCH_TOLERANCE = 1;
     private float mX, mY;
     private Path mPath;
     private Paint mPaint;
