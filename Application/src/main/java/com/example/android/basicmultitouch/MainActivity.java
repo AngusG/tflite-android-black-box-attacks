@@ -56,10 +56,12 @@ public class MainActivity extends Activity {
 
         SeekBar seekBar = (SeekBar) findViewById(R.id.strokeThickness);
         final TextView seekBarValue = (TextView) findViewById(R.id.seekBarValue);
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarValue.setText(String.valueOf(progress));
+                paintView.setStrokeWidth(progress);
             }
 
             @Override
