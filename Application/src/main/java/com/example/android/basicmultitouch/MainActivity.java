@@ -20,15 +20,19 @@ import android.app.Activity;
 import android.os.Bundle;
 //import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
+
+import java.io.IOException;
 
 /**
  * This is an example of keeping track of individual touches across multiple
@@ -45,10 +49,22 @@ import org.w3c.dom.Text;
 public class MainActivity extends Activity {
 
     private PaintView paintView;
+    private ImageClassifier classifier;
+
+    /** Tag for the {@link Log}. */
+    private static final String TAG = "AttackDemoActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Load the model and labels.
+        try {
+            classifier = new ImageClassifierDigits(this);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to initialize an image classifier.", e);
+        }
+        //startBackgroundThread();
+
         setContentView(R.layout.activity_main);
         paintView = (PaintView) findViewById(R.id.paintView);
         DisplayMetrics metrics = new DisplayMetrics();
@@ -77,6 +93,13 @@ public class MainActivity extends Activity {
 
         Button resetButton = (Button) findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                paintView.clear();
+            }
+        });
+
+        Switch modelSwitch = (Switch) findViewById(R.id.modelSwitch);
+        modelSwitch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 paintView.clear();
             }

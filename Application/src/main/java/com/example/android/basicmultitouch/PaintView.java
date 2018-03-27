@@ -41,6 +41,8 @@ public class PaintView extends View {
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
+    //private ImageClassifier classifier;
+
     public PaintView(Context context) {
         this(context, null);
     }

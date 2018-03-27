@@ -170,8 +170,16 @@ public abstract class ImageClassifier {
         // Convert the image to floating point.
         int pixel = 0;
         long startTime = SystemClock.uptimeMillis();
+        /*
         for (int i = 0; i < getImageSizeX(); ++i) {
             for (int j = 0; j < getImageSizeY(); ++j) {
+                final int val = intValues[pixel++];
+                addPixelValue(val);
+            }
+        }
+        */
+        for (int i = 0; i < getImageSizeX(); i+=10) {
+            for (int j = 0; j < getImageSizeY(); j+=10) {
                 final int val = intValues[pixel++];
                 addPixelValue(val);
             }
