@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -69,7 +70,10 @@ public class MainActivity extends Activity {
         paintView = (PaintView) findViewById(R.id.paintView);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        paintView.init(metrics);
+        ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
+        paintView.init(metrics, classifier, predictionBar);
+
+        //final ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
 
         SeekBar seekBar = (SeekBar) findViewById(R.id.strokeThickness);
         final TextView seekBarValue = (TextView) findViewById(R.id.seekBarValue);
@@ -78,6 +82,7 @@ public class MainActivity extends Activity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarValue.setText(String.valueOf(progress));
                 paintView.setStrokeWidth(progress);
+                //predictionBar.setProgress(progress);
             }
 
             @Override

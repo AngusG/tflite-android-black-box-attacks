@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" />
-      <module fileurl="file://$PROJECT_DIR$/BasicMultitouch.iml" filepath="$PROJECT_DIR$/BasicMultitouch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tflite-android-black-box-attacks.iml" filepath="$PROJECT_DIR$/tflite-android-black-box-attacks.iml" />
     </modules>
   </component>
 </project>

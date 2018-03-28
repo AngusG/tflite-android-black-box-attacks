@@ -12,20 +12,13 @@ import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * Classifies images with Tensorflow Lite.
@@ -36,7 +29,7 @@ public abstract class ImageClassifier {
     private static final String TAG = "AttackDemo";
 
     /** Number of results to show in the UI. */
-    private static final int RESULTS_TO_SHOW = 3;
+    private static final int RESULTS_TO_SHOW = 1;
 
     /** Dimensions of inputs. */
     private static final int DIM_BATCH_SIZE = 1;
@@ -56,6 +49,7 @@ public abstract class ImageClassifier {
     protected ByteBuffer imgData = null;
 
     /** multi-stage low pass filter * */
+    /*
     private float[][] filterLabelProbArray = null;
 
     private static final int FILTER_STAGES = 3;
@@ -70,11 +64,11 @@ public abstract class ImageClassifier {
                             return (o1.getValue()).compareTo(o2.getValue());
                         }
                     });
-
+    */
     /** Initializes an {@code ImageClassifier}. */
     ImageClassifier(Activity activity) throws IOException {
         tflite = new Interpreter(loadModelFile(activity));
-        labelList = loadLabelList(activity);
+        //labelList = loadLabelList(activity);
         imgData =
                 ByteBuffer.allocateDirect(
                         DIM_BATCH_SIZE
@@ -83,16 +77,19 @@ public abstract class ImageClassifier {
                                 * DIM_PIXEL_SIZE
                                 * getNumBytesPerChannel());
         imgData.order(ByteOrder.nativeOrder());
+        /*
         filterLabelProbArray = new float[FILTER_STAGES][getNumLabels()];
         Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
+        */
     }
 
     /** Classifies a frame from the preview stream. */
-    String classifyFrame(Bitmap bitmap) {
+    public float classifyFrame(Bitmap bitmap) {
         if (tflite == null) {
             Log.e(TAG, "Image classifier has not been initialized; Skipped.");
-            return "Uninitialized Classifier.";
+            return 0.5f;
         }
+
         convertBitmapToByteBuffer(bitmap);
         // Here's where the magic happens!!!
         long startTime = SystemClock.uptimeMillis();
@@ -101,14 +98,15 @@ public abstract class ImageClassifier {
         Log.d(TAG, "Timecost to run model inference: " + Long.toString(endTime - startTime));
 
         // Smooth the results across frames.
-        applyFilter();
+        //applyFilter();
 
         // Print the results.
-        String textToShow = printTopKLabels();
-        textToShow = Long.toString(endTime - startTime) + "ms" + textToShow;
-        return textToShow;
+        //String textToShow = printTopKLabels();
+        //String textToShow = Long.toString(endTime - startTime) + "ms"; // + textToShow;
+        return getProbability(0);
     }
 
+    /*
     void applyFilter() {
         int numLabels = getNumLabels();
 
@@ -129,7 +127,7 @@ public abstract class ImageClassifier {
         for (int j = 0; j < numLabels; ++j) {
             setProbability(j, filterLabelProbArray[FILTER_STAGES - 1][j]);
         }
-    }
+    }*/
 
     /** Closes tflite to release resources. */
     public void close() {
@@ -138,6 +136,7 @@ public abstract class ImageClassifier {
     }
 
     /** Reads label list from Assets. */
+    /*
     private List<String> loadLabelList(Activity activity) throws IOException {
         List<String> labelList = new ArrayList<String>();
         BufferedReader reader =
@@ -148,7 +147,7 @@ public abstract class ImageClassifier {
         }
         reader.close();
         return labelList;
-    }
+    }*/
 
     /** Memory-map the model file in Assets. */
     private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
@@ -166,20 +165,13 @@ public abstract class ImageClassifier {
             return;
         }
         imgData.rewind();
+        // Returns in intValues[] a copy of the data in the bitmap. Each value is a packed int representing a Color.
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
         // Convert the image to floating point.
         int pixel = 0;
         long startTime = SystemClock.uptimeMillis();
-        /*
         for (int i = 0; i < getImageSizeX(); ++i) {
             for (int j = 0; j < getImageSizeY(); ++j) {
-                final int val = intValues[pixel++];
-                addPixelValue(val);
-            }
-        }
-        */
-        for (int i = 0; i < getImageSizeX(); i+=10) {
-            for (int j = 0; j < getImageSizeY(); j+=10) {
                 final int val = intValues[pixel++];
                 addPixelValue(val);
             }
@@ -189,6 +181,7 @@ public abstract class ImageClassifier {
     }
 
     /** Prints top-K labels, to be shown in UI as the results. */
+    /*
     private String printTopKLabels() {
         for (int i = 0; i < getNumLabels(); ++i) {
             sortedLabels.add(
@@ -205,6 +198,7 @@ public abstract class ImageClassifier {
         }
         return textToShow;
     }
+    */
 
     /**
      * Get the name of the model file stored in Assets.
@@ -287,8 +281,10 @@ public abstract class ImageClassifier {
      *
      * @return
      */
+    /*
     protected int getNumLabels() {
         return labelList.size();
     }
+    */
 }
 

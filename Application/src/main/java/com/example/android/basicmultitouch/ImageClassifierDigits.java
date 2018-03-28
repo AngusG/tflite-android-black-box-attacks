@@ -1,6 +1,8 @@
 package com.example.android.basicmultitouch;
 
 import android.app.Activity;
+import android.graphics.Color;
+
 import java.io.IOException;
 
 /**
@@ -13,7 +15,7 @@ public class ImageClassifierDigits extends ImageClassifier {
      * An array to hold inference results, to be feed into Tensorflow Lite as outputs.
      * This isn't part of the super class, because we need a primitive array here.
      */
-    private byte[][] labelProbArray = null;
+    private float[][] labelProbArray = null;
 
     /**
      * Initializes an {@code ImageClassifier}.
@@ -22,12 +24,13 @@ public class ImageClassifierDigits extends ImageClassifier {
      */
     ImageClassifierDigits(Activity activity) throws IOException {
         super(activity);
-        labelProbArray = new byte[1][getNumLabels()];
+        //labelProbArray = new byte[1][getNumLabels()];
+        labelProbArray = new float[1][1];
     }
 
     @Override
     protected String getModelPath() {
-        return "natural.tflite";
+        return "diff.tflite";
     }
 
     @Override
@@ -47,15 +50,25 @@ public class ImageClassifierDigits extends ImageClassifier {
 
     @Override
     protected int getNumBytesPerChannel() {
-        // the quantized model uses a single byte only
+        // the non-quantized model uses a 4 bytes
         return 4;
     }
 
     @Override
     protected void addPixelValue(int pixelValue) {
+        /*
         imgData.put((byte) ((pixelValue >> 16) & 0xFF));
         imgData.put((byte) ((pixelValue >> 8) & 0xFF));
         imgData.put((byte) (pixelValue & 0xFF));
+        */
+        //imgData.putFloat((pixelValue >> 16) & 0xFF);
+        //imgData.putFloat((pixelValue >> 8) & 0xFF);
+        //Float val = (float) (pixelValue & 0xFF);
+        Float val = 1.0f;
+        if (pixelValue == Color.BLACK) {
+            val = 0.0f;
+        }
+        imgData.putFloat(val);
     }
 
     @Override
@@ -70,7 +83,8 @@ public class ImageClassifierDigits extends ImageClassifier {
 
     @Override
     protected float getNormalizedProbability(int labelIndex) {
-        return (labelProbArray[0][labelIndex] & 0xff);
+        //return (labelProbArray[0][labelIndex] & 0xff);
+        return labelProbArray[0][labelIndex];
     }
 
     @Override

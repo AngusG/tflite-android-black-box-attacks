@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
@@ -17,14 +19,18 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
 public class PaintView extends View {
 
     public static int BRUSH_SIZE = 30;
-    public static final int DEFAULT_COLOR = Color.BLACK;
-    public static final int DEFAULT_BG_COLOR = Color.WHITE;
+    public static final int DEFAULT_COLOR = Color.WHITE;
+    //public static final int DEFAULT_COLOR = 255;
+    public static final int DEFAULT_BG_COLOR = Color.BLACK;
+    //public static final int DEFAULT_BG_COLOR = 0;
+    public ProgressBar predictionBar;
     private static final float TOUCH_TOLERANCE = 1;
     private float mX, mY;
     private Path mPath;
@@ -41,7 +47,7 @@ public class PaintView extends View {
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-    //private ImageClassifier classifier;
+    private ImageClassifier mClassifier;
 
     public PaintView(Context context) {
         this(context, null);
@@ -53,6 +59,7 @@ public class PaintView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
         mPaint.setColor(DEFAULT_COLOR);
+        //mPaint.setAlpha(DEFAULT_COLOR);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -63,16 +70,36 @@ public class PaintView extends View {
         mBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
     }
 
-    public void init(DisplayMetrics metrics) {
+    public void init(DisplayMetrics metrics, ImageClassifier classifier, ProgressBar predictionBar) {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
 
+        //mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
 
         currentColor = DEFAULT_COLOR;
         strokeWidth = BRUSH_SIZE;
+        mClassifier = classifier;
+        this.predictionBar = predictionBar;
     }
+    /*
+    public Bitmap toGrayscale(Bitmap bmpOriginal) {
+        int width, height;
+        height = bmpOriginal.getHeight();
+        width = bmpOriginal.getWidth();
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(f);
+        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        return bmpGrayscale;
+    }
+    */
 
     public void normal() {
         emboss = false;
@@ -103,6 +130,7 @@ public class PaintView extends View {
 
         for (FingerPath fp : paths) {
             mPaint.setColor(fp.color);
+            //mPaint.setAlpha(fp.color);
             mPaint.setStrokeWidth(fp.strokeWidth);
             mPaint.setMaskFilter(null);
 
@@ -112,10 +140,9 @@ public class PaintView extends View {
                 mPaint.setMaskFilter(mBlur);
 
             mCanvas.drawPath(fp.path, mPaint);
-
         }
-
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        //Bitmap frame = Bitmap.createBitmap(classifier.getImageSizeX() * classifier.getImageSizeY(), Bitmap.Config.ARGB_8888);
         canvas.restore();
     }
 
@@ -165,6 +192,10 @@ public class PaintView extends View {
                 break;
             case MotionEvent.ACTION_UP :
                 touchUp();
+                //toGrayscale(mBitmap);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(mBitmap, mClassifier.getImageSizeX(), mClassifier.getImageSizeY(), false);
+                Float prediction = mClassifier.classifyFrame(scaledBitmap);
+                predictionBar.setProgress((int) (prediction * 100));
                 invalidate();
                 break;
         }
