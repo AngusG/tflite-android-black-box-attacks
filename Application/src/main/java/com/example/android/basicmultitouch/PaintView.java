@@ -31,7 +31,12 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class PaintView extends View {
 
@@ -60,6 +65,7 @@ public class PaintView extends View {
     final ArrayList<String> xAxisLabel = new ArrayList<>();
 
     private ImageClassifier mClassifier;
+    private FileOutputStream pngFile;
 
     public PaintView(Context context) {
         this(context, null);
@@ -83,8 +89,9 @@ public class PaintView extends View {
     }
 
     public void init(DisplayMetrics metrics, ImageClassifier classifier, BarChart barChart) {
-        int height = metrics.heightPixels;
-        int width = metrics.widthPixels;
+        int height = 942;
+        int width = 1040;
+
 
         //mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -229,7 +236,17 @@ public class PaintView extends View {
             case MotionEvent.ACTION_UP :
                 touchUp();
                 //toGrayscale(mBitmap);
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(mBitmap, mClassifier.getImageSizeX(), mClassifier.getImageSizeY(), false);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(mBitmap, mClassifier.getImageSizeX(), mClassifier.getImageSizeY(), true);
+                Random rng = new Random();
+
+                try {
+                    File mFile;
+                    mFile = this.getContext().getExternalFilesDir(String.valueOf(rng.nextLong() + ".png"));
+                    FileOutputStream pngFile = new FileOutputStream(mFile);
+                }
+                catch (Exception e){
+                }
+                //scaledBitmap.compress(Bitmap.CompressFormat.PNG, 90, pngFile);
                 Float prediction = mClassifier.classifyFrame(scaledBitmap);
                 //predictionBar.setProgress((int) (prediction * 100));
                 //dataSet.addEntry(...);
