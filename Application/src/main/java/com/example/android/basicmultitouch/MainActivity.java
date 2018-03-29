@@ -32,9 +32,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 
 import java.io.IOException;
@@ -86,14 +89,15 @@ public class MainActivity extends Activity {
         ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
         BarChart barChart = (BarChart) findViewById(R.id.barChart);
         barChart.animateY(3000);
-        barChart.getXAxis().setEnabled(false);
+        barChart.getXAxis().setEnabled(true);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setAxisMinimum(0.0f); // start at zero
         barChart.getAxisLeft().setAxisMaximum(1.0f); // the axis maximum is 100
+        barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
 
         // the labels that should be drawn on the XAxis
-        /*
-        final String[] barLabels = new String[] { "0", "1", "1", "3", "4", "5", "6", "7", "8", "9"};
+        final String[] barLabels = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
@@ -101,16 +105,21 @@ public class MainActivity extends Activity {
             public String getFormattedValue(float value, AxisBase axis) {
                 return barLabels[(int) value];
             }
-        };*/
+        };
 
-        //barChart.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
-        //barChart.getXAxis().setValueFormatter(formatter);
+        barChart.getXAxis().setGranularity(0f); // minimum axis-step (interval) is 1
+        barChart.getXAxis().setValueFormatter(formatter);
+        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        barChart.getXAxis().setTextSize(5f);
+
         BARENTRY = new ArrayList<>();
         initializeBARENTRY();
         //AddValuesToBarEntryLabels();
         Bardataset = new BarDataSet(BARENTRY, "project");
+        //Bardataset = new BarDataSet(BARENTRY);
         BARDATA = new BarData(Bardataset);
         barChart.setData(BARDATA);
+
 
         paintView.init(metrics, classifier, barChart);
 
@@ -121,7 +130,7 @@ public class MainActivity extends Activity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //seekBarValue.setText(String.valueOf(progress));
+                modelText.setText(String.valueOf(progress));
                 paintView.setStrokeWidth(progress);
                 //predictionBar.setProgress(progress);
             }
@@ -174,26 +183,35 @@ public class MainActivity extends Activity {
                 classifier.close();
                 try {
                     classifier = new ImageClassifierNormal(this);
+                    Log.v(TAG, "Initialized Normal classifier.");
                 } catch (IOException e) {
                     Log.e(TAG, "Failed to initialize an image classifier.", e);
                 }
                 //modelText.setText("Normal");
-                paintView.normal();
+                //paintView.normal();
                 paintView.setClassifier(classifier);
                 return true;
             case R.id.PGD:
                 classifier.close();
                 try {
                     classifier = new ImageClassifierPGD(this);
+                    Log.v(TAG, "Initialized Madry classifier.");
                 } catch (IOException e) {
                     Log.e(TAG, "Failed to initialize an image classifier.", e);
                 }
                 //modelText.setText("PGD");
-                paintView.emboss();
+                //paintView.emboss();
                 paintView.setClassifier(classifier);
                 return true;
-            case R.id.blur:
-                paintView.blur();
+            case R.id.CleverHans:
+                classifier.close();
+                try {
+                    classifier = new ImageClassifierCleverHans(this);
+                    Log.v(TAG, "Initialized CleverHans classifier.");
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to initialize an image classifier.", e);
+                }
+                //paintView.blur();
                 return true;
             case R.id.clear:
                 paintView.clear();

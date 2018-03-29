@@ -13,9 +13,9 @@
         android:title="PGD" />
 
     <item
-        android:id="@+id/blur"
+        android:id="@+id/CleverHans"
         app:showAsAction="never"
-        android:title="Blur" />
+        android:title="Robust" />
 
     <item
         android:id="@+id/clear"
