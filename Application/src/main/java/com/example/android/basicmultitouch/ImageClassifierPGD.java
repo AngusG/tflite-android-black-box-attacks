@@ -9,7 +9,7 @@ import java.io.IOException;
  * Created by gallowaa on 26/03/18.
  */
 
-public class ImageClassifierDigits extends ImageClassifier {
+public class ImageClassifierPGD extends ImageClassifier {
 
     /**
      * An array to hold inference results, to be feed into Tensorflow Lite as outputs.
@@ -22,15 +22,14 @@ public class ImageClassifierDigits extends ImageClassifier {
      *
      * @param activity
      */
-    ImageClassifierDigits(Activity activity) throws IOException {
+    ImageClassifierPGD(Activity activity) throws IOException {
         super(activity);
-        //labelProbArray = new byte[1][getNumLabels()];
         labelProbArray = new float[1][10];
     }
 
     @Override
     protected String getModelPath() {
-        return "natural.tflite";
+        return "public.tflite";
     }
 
     @Override
@@ -56,14 +55,6 @@ public class ImageClassifierDigits extends ImageClassifier {
 
     @Override
     protected void addPixelValue(int pixelValue) {
-        /*
-        imgData.put((byte) ((pixelValue >> 16) & 0xFF));
-        imgData.put((byte) ((pixelValue >> 8) & 0xFF));
-        imgData.put((byte) (pixelValue & 0xFF));
-        */
-        //imgData.putFloat((pixelValue >> 16) & 0xFF);
-        //imgData.putFloat((pixelValue >> 8) & 0xFF);
-        //Float val = (float) (pixelValue & 0xFF);
         Float val = 1.0f;
         if (pixelValue == Color.BLACK) {
             val = 0.0f;
@@ -83,7 +74,6 @@ public class ImageClassifierDigits extends ImageClassifier {
 
     @Override
     protected float getNormalizedProbability(int labelIndex) {
-        //return (labelProbArray[0][labelIndex] & 0xff);
         return labelProbArray[0][labelIndex];
     }
 

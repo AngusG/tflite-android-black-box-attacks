@@ -17,6 +17,7 @@
 package com.example.android.basicmultitouch;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 //import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -28,20 +29,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.data.BarEntry;
 
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,6 +63,7 @@ public class MainActivity extends Activity {
     BarDataSet Bardataset;
     BarData BARDATA;
 
+    private TextView modelText;
     private PaintView paintView;
     private ImageClassifier classifier;
 
@@ -77,7 +72,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         // Load the model and labels.
         try {
-            classifier = new ImageClassifierDigits(this);
+            classifier = new ImageClassifierNormal(this);
         } catch (IOException e) {
             Log.e(TAG, "Failed to initialize an image classifier.", e);
         }
@@ -87,6 +82,7 @@ public class MainActivity extends Activity {
         paintView = (PaintView) findViewById(R.id.paintView);
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
         ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
         BarChart barChart = (BarChart) findViewById(R.id.barChart);
         barChart.animateY(3000);
@@ -119,13 +115,13 @@ public class MainActivity extends Activity {
         paintView.init(metrics, classifier, barChart);
 
         //final ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
-
+        final TextView modelText = (TextView) findViewById(R.id.modelType);
+        modelText.setText("Normal");
         SeekBar seekBar = (SeekBar) findViewById(R.id.strokeThickness);
-        final TextView seekBarValue = (TextView) findViewById(R.id.seekBarValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                seekBarValue.setText(String.valueOf(progress));
+                //seekBarValue.setText(String.valueOf(progress));
                 paintView.setStrokeWidth(progress);
                 //predictionBar.setProgress(progress);
             }
@@ -140,7 +136,7 @@ public class MainActivity extends Activity {
 
             }
         });
-        /*
+
         Button resetButton = (Button) findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -148,6 +144,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        /*
         Switch modelSwitch = (Switch) findViewById(R.id.modelSwitch);
         modelSwitch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -174,10 +171,26 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.normal:
+                classifier.close();
+                try {
+                    classifier = new ImageClassifierNormal(this);
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to initialize an image classifier.", e);
+                }
+                //modelText.setText("Normal");
                 paintView.normal();
+                paintView.setClassifier(classifier);
                 return true;
-            case R.id.emboss:
+            case R.id.PGD:
+                classifier.close();
+                try {
+                    classifier = new ImageClassifierPGD(this);
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to initialize an image classifier.", e);
+                }
+                //modelText.setText("PGD");
                 paintView.emboss();
+                paintView.setClassifier(classifier);
                 return true;
             case R.id.blur:
                 paintView.blur();

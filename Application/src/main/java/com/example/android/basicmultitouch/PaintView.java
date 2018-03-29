@@ -164,6 +164,10 @@ public class PaintView extends View {
         strokeWidth = brushThickness;
     }
 
+    public void setClassifier(ImageClassifier classifier) {
+        mClassifier = classifier;
+    }
+
     private void touchStart(float x, float y) {
         mPath = new Path();
         FingerPath fp = new FingerPath(currentColor, emboss, blur, strokeWidth, mPath);

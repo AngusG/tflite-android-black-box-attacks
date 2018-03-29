@@ -8,9 +8,9 @@
         android:title="Normal" />
 
     <item
-        android:id="@+id/emboss"
+        android:id="@+id/PGD"
         app:showAsAction="never"
-        android:title="Emboss" />
+        android:title="PGD" />
 
     <item
         android:id="@+id/blur"
