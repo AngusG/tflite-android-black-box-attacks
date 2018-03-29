@@ -21,6 +21,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
 import java.util.ArrayList;
 
 public class PaintView extends View {
@@ -46,6 +56,8 @@ public class PaintView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    private BarChart barChart;
+    final ArrayList<String> xAxisLabel = new ArrayList<>();
 
     private ImageClassifier mClassifier;
 
@@ -70,7 +82,7 @@ public class PaintView extends View {
         mBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
     }
 
-    public void init(DisplayMetrics metrics, ImageClassifier classifier, ProgressBar predictionBar) {
+    public void init(DisplayMetrics metrics, ImageClassifier classifier, BarChart barChart) {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
 
@@ -82,6 +94,8 @@ public class PaintView extends View {
         strokeWidth = BRUSH_SIZE;
         mClassifier = classifier;
         this.predictionBar = predictionBar;
+        this.barChart = barChart;
+        addValuesToBarEntryLabels();
     }
     /*
     public Bitmap toGrayscale(Bitmap bmpOriginal) {
@@ -176,10 +190,28 @@ public class PaintView extends View {
         mPath.lineTo(mX, mY);
     }
 
+    public BarData updateBarEntry() {
+        ArrayList<BarEntry> mBarEntry = new ArrayList<>();
+        for (int j = 0; j < 10; ++j) {
+            mBarEntry.add(new BarEntry(j, mClassifier.getProbability(j)));
+        }
+        BarDataSet mBarDataSet = new BarDataSet(mBarEntry, "Projects");
+        mBarDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        BarData mBardData = new BarData(mBarDataSet);
+        return mBardData;
+    }
+
+    public void addValuesToBarEntryLabels() {
+        for (int j = 0; j < 10; ++j) {
+            xAxisLabel.add(Integer.toString(j));
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+        BarData exampleData;
 
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN :
@@ -195,8 +227,22 @@ public class PaintView extends View {
                 //toGrayscale(mBitmap);
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(mBitmap, mClassifier.getImageSizeX(), mClassifier.getImageSizeY(), false);
                 Float prediction = mClassifier.classifyFrame(scaledBitmap);
-                predictionBar.setProgress((int) (prediction * 100));
-                invalidate();
+                //predictionBar.setProgress((int) (prediction * 100));
+                //dataSet.addEntry(...);
+                exampleData = updateBarEntry();
+                barChart.animateY(1000, Easing.EasingOption.EaseOutQuad);
+                XAxis xAxis = barChart.getXAxis();
+                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        return xAxisLabel.get((int) value);
+                    }
+                });
+                barChart.setData(exampleData);
+                exampleData.notifyDataChanged(); // let the data know a dataSet changed
+                barChart.notifyDataSetChanged(); // let the chart know it's data changed
+                //barChart.invalidate(); // refresh
+                //invalidate();
                 break;
         }
 

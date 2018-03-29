@@ -31,9 +31,20 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.data.BarEntry;
+
+
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * This is an example of keeping track of individual touches across multiple
@@ -49,11 +60,17 @@ import java.io.IOException;
 //public class MainActivity extends AppCompatActivity {
 public class MainActivity extends Activity {
 
-    private PaintView paintView;
-    private ImageClassifier classifier;
-
     /** Tag for the {@link Log}. */
     private static final String TAG = "AttackDemoActivity";
+
+    // Chart Initials
+    BarChart chart ;
+    ArrayList<BarEntry> BARENTRY;
+    BarDataSet Bardataset;
+    BarData BARDATA;
+
+    private PaintView paintView;
+    private ImageClassifier classifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +88,35 @@ public class MainActivity extends Activity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
-        paintView.init(metrics, classifier, predictionBar);
+        BarChart barChart = (BarChart) findViewById(R.id.barChart);
+        barChart.animateY(3000);
+        barChart.getXAxis().setEnabled(false);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setAxisMinimum(0.0f); // start at zero
+        barChart.getAxisLeft().setAxisMaximum(1.0f); // the axis maximum is 100
+
+        // the labels that should be drawn on the XAxis
+        /*
+        final String[] barLabels = new String[] { "0", "1", "1", "3", "4", "5", "6", "7", "8", "9"};
+
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return barLabels[(int) value];
+            }
+        };*/
+
+        //barChart.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
+        //barChart.getXAxis().setValueFormatter(formatter);
+        BARENTRY = new ArrayList<>();
+        initializeBARENTRY();
+        //AddValuesToBarEntryLabels();
+        Bardataset = new BarDataSet(BARENTRY, "project");
+        BARDATA = new BarData(Bardataset);
+        barChart.setData(BARDATA);
+
+        paintView.init(metrics, classifier, barChart);
 
         //final ProgressBar predictionBar = (ProgressBar) findViewById(R.id.predictionBar);
 
@@ -95,7 +140,7 @@ public class MainActivity extends Activity {
 
             }
         });
-
+        /*
         Button resetButton = (Button) findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -109,6 +154,13 @@ public class MainActivity extends Activity {
                 paintView.clear();
             }
         });
+        */
+    }
+
+    public void initializeBARENTRY() {
+        for (int j = 0; j < 10; ++j) {
+            BARENTRY.add(new BarEntry(j, 0.1f));
+        }
     }
 
     @Override

@@ -25,12 +25,12 @@ public class ImageClassifierDigits extends ImageClassifier {
     ImageClassifierDigits(Activity activity) throws IOException {
         super(activity);
         //labelProbArray = new byte[1][getNumLabels()];
-        labelProbArray = new float[1][1];
+        labelProbArray = new float[1][10];
     }
 
     @Override
     protected String getModelPath() {
-        return "diff.tflite";
+        return "natural.tflite";
     }
 
     @Override
