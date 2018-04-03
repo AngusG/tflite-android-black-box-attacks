@@ -1,11 +1,14 @@
 
-Android BasicMultitouch Sample
+Human-Driven Black-Box Attacks in Android
 ===================================
 
-Sample demonstrates the use of [MotionEvent][1] properties to keep track of
-individual touches across multiple touch events.
+A demo using TensorFlow-Lite that lets users hand draw their own black-box 
+attacks against the Madry et al. (2018) models secured with PGD for MNIST.
+Toggle between naturally trained and PGD trained models, and play with 
+the brush stroke thickness to explore this models vulnerabilities.
+Softmax probabilities updated on finger lift. 
 
-[1]: http://developer.android.com/reference/android/view/MotionEvent.html
+![Alt Text](demo_zero_opt.gif)
 
 Introduction
 ------------
