@@ -2,24 +2,15 @@
 Human-Driven Black-Box Attacks in Android
 ===================================
 
-A demo using TensorFlow-Lite that lets users hand draw their own targeted 
-or untargeted black-box attacks against the Madry et al. (2018) models, 
-which have been secured with PGD for perturbations bounded by 0.3 in the 
-L_\infty threat model. We've replaced all variables with constants using the
-pre-trained checkpoints <https://github.com/MadryLab/mnist_challenge>, 
-frozen the graph, and exported to tflite format. 
+A TensorFlow-Lite demo for hand drawing targeted or untargeted black-box attacks for the Madry et al. (2018) models, which have been secured with PGD for perturbations bounded by 0.3 in the L_\infty threat model. We've replaced all variables in their pre-trained checkpoints <https://github.com/MadryLab/mnist_challenge> with constants, frozen the graph, and exported to tflite format.
 
-Our concern is that since this defense is typically referred to as "state-of-the-art",
-people may begin to deploy these models in real world applications under the impression
-they must be secure. In **Adversarial Training Versus Weight Decay**, we argue that this
-is a somewhat obscure threat model in practice. Using adversarial training with high-capacity
-tends to confer robustness for one metric, but not others. This mobile app shows how a human
-can fairly easily craft targeted attacks in the black-box setting (without access to the training
-data, model architecture, parameters, etc). 
+Our concern is that since this defense is typically referred to as "state-of-the-art", and its limitations are only beginning to be explored, people may deploy these models in real world applications under the impression that they should generalize well in practice. In **Adversarial Training Versus Weight Decay**, we argue that studying L_\infty is important for security, but does not say anything about robustness for other types of perturbations we would like our models to be robust to, such as randomly swapping pixels and other Hamming distance (L0 counting "norm") bounded attacks, changing the background intensity, rotating digits, etc. 
+
+We do not invalidate any of the formal claims made by Madry et al. (2018), but we respectfully disagree with their suggestion of increasing model capacity s.t. we can train against a strong adversary. This becomes an arms race to overfit a specific attack, and generalize poorly. This mobile app shows how a human can fairly easily craft targeted attacks without access to the training data, model architecture, parameters, or having to train a substitute model. For an attacker, this is strictly more difficult than in the white-box setting where we may rely on gradient signal for crafting less perceptible adversarial examples.
 
 Toggle between the **naturally** trained and **public PGD** trained models with a menu in 
-upper-right corner, and experiment with the brush stroke thickness and Hamming distance single-pixel-like
-attacks to explore this model's vulnerabilities. Softmax probabilities refresh on finger lift. 
+upper-right corner, and experiment with the brush stroke thickness and Hamming distance few-pixel
+attacks to explore this model's weaknesses. Softmax probabilities refresh on finger lift. 
 
 Pre-requisites
 --------------
