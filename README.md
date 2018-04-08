@@ -2,32 +2,24 @@
 Human-Driven Black-Box Attacks in Android
 ===================================
 
-A demo using TensorFlow-Lite that lets users hand draw their own black-box 
-attacks against the Madry et al. (2018) models secured with PGD for MNIST.
-Toggle between naturally trained and PGD trained models, and play with 
-the brush stroke thickness to explore this models vulnerabilities.
-Softmax probabilities updated on finger lift. 
+A demo using TensorFlow-Lite that lets users hand draw their own targeted 
+or untargeted black-box attacks against the Madry et al. (2018) models, 
+which have been secured with PGD for perturbations bounded by 0.3 in the 
+L_\infty threat model. We've replaced all variables with constants using the
+pre-trained checkpoints <https://github.com/MadryLab/mnist_challenge>, 
+frozen the graph, and exported to tflite format. 
 
-![Alt Text](demo_zero_opt.gif)
+Our concern is that since this defense is typically referred to as "state-of-the-art",
+people may begin to deploy these models in real world applications under the impression
+they must be secure. In **Adversarial Training Versus Weight Decay**, we argue that this
+is a somewhat obscure threat model in practice. Using adversarial training with high-capacity
+tends to confer robustness for one metric, but not others. This mobile app shows how a human
+can fairly easily craft targeted attacks in the black-box setting (without access to the training
+data, model architecture, parameters, etc). 
 
-Introduction
-------------
-
-This is an example of keeping track of individual touches across multiple
-[MotionEvent][1]s.
-
-This sample uses a custom View (`TouchDisplayView`) that responds to
-touch events and draws a colored circle for each touch point. The view holds
-data related to a touch pointer, including its current position, pressure,
-and its past touch history.
-
-The View draws graphics based on data associated with each touch event to a
-canvas. A large circle indicates the current position of a touch, while smaller
-trailing circles represent previous positions for that touch.
-The size of the large circle is scaled depending on the pressure of the user's
-touch.
-
-[1]: http://developer.android.com/reference/android/view/MotionEvent.html
+Toggle between the **naturally** trained and **public PGD** trained models with a menu in 
+upper-right corner, and experiment with the brush stroke thickness and Hamming distance single-pixel-like
+attacks to explore this model's vulnerabilities. Softmax probabilities refresh on finger lift. 
 
 Pre-requisites
 --------------
@@ -35,11 +27,12 @@ Pre-requisites
 - Android SDK 27
 - Android Build Tools v27.0.2
 - Android Support Repository
+- TensorFlow 1.6.x
 
-Screenshots
+Screenshots and Adversarial Examples
 -------------
 
-<img src="screenshots/intro.png" height="400" alt="Screenshot"/> <img src="screenshots/touches.png" height="400" alt="Screenshot"/> 
+<img src="screenshots/bbox_5_to_9.png" height="400" alt="5-to-9"/> <img src="screenshots/bbox_6_to_2.png" height="400" alt="6-to-2"/> <img src="screenshots/bbox_6_to_3.png" height="400" alt="6-to-3"/> <img src="screenshots/bbox_7_to_2.png" height="400" alt="7-to-2"/> <img src="screenshots/bbox_7_to_conf_2.png" height="400" alt="7-to-conf-2"/> <img src="screenshots/demo_zero_opt.gif" height="400" alt="demo"/> 
 
 Getting Started
 ---------------
@@ -50,31 +43,24 @@ This sample uses the Gradle build system. To build this project, use the
 Support
 -------
 
-- Google+ Community: https://plus.google.com/communities/105153134372062985968
-- Stack Overflow: http://stackoverflow.com/questions/tagged/android
-
-If you've found an error in this sample, please file an issue:
-https://github.com/googlesamples/android-BasicMultitouch
+If you've found an error in this sample, please file an issue.
 
 Patches are encouraged, and may be submitted by forking this project and
-submitting a pull request through GitHub. Please see CONTRIBUTING.md for more details.
+submitting a pull request through GitHub.
 
-License
+Citation and Acknowledgements
 -------
 
-Copyright 2017 The Android Open Source Project, Inc.
+Thanks to Bradley Kennedy for pair-programming in the car on the way to Vector, and to Jonathan MacPherson for enthusiastically setting up the initial chart functionality.
 
-Licensed to the Apache Software Foundation (ASF) under one or more contributor
-license agreements.  See the NOTICE file distributed with this work for
-additional information regarding copyright ownership.  The ASF licenses this
-file to you under the Apache License, Version 2.0 (the "License"); you may not
-use this file except in compliance with the License.  You may obtain a copy of
-the License at
+This project is affiliated with **Adversarial Training Versus Weight Decay**, to appear on arXiv shortly:
 
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-License for the specific language governing permissions and limitations under
-the License.
+Bibtex:  
+```
+@article{galloway2018adversarial,  
+  title={Adversarial Training Versus Weight Decay},  
+  author={Galloway, Angus and Tanay, Thomas and Taylor, Graham W},  
+  journal={arXiv preprint arXiv:xxxx.XXXXX},  
+  year={2018}  
+}
+```
